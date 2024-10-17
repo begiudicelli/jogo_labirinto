@@ -2,62 +2,96 @@
 
 int nextId = 1;
 
+void collectItem(Room *room, Player *player) {
+	if (room->items != NULL) {
+		Item *itemToCollect = room->items;
+		room->items = room->items->next;
+		itemToCollect->next = player->inventory;
+		player->inventory = itemToCollect;
+		printf("Você coletou: %s\n", itemToCollect->name);
+	} else {
+		printf("Não há itens nesta sala.\n");
+	}
+}
+
+void addItemToRoom(Room *room, Item item) {
+	if (room == NULL)
+		return;
+	Item *newItem = createItemList(item.id, item.name);
+	newItem->next = room->items;
+	room->items = newItem;
+}
+
 Item* createItemList(int id, char *name) {
-	Item* newItem = (Item*)malloc(sizeof(Item));
-    newItem->id = id;
-    newItem->name = strdup(name);
-    newItem->next = NULL;
-    return newItem;
+	Item *newItem = (Item*) malloc(sizeof(Item));
+	newItem->id = id;
+	newItem->name = strdup(name);
+	newItem->next = NULL;
+	return newItem;
 }
 
-void insertItem(Item** head, int id, char *name) {
-	Item* newNode = createItemList(id, name);
-    newNode->next = *head;
-    *head = newNode;
-}
-
-Room* createRoom(const char *description) {
+Room* createRoom(const char *description, const char *secondDescription) {
 	Room *newRoom = (Room*) malloc(sizeof(Room));
 	newRoom->id = nextId++;
 	newRoom->description = strdup(description);
+	newRoom->secondDescription = strdup(secondDescription);
 	newRoom->right = NULL;
 	newRoom->left = NULL;
 	newRoom->parent = NULL;
+	newRoom->items = NULL;
+	newRoom->requiredItemId = 0;
+	newRoom->visited = false;
 	return newRoom;
 }
 
-void insertChildRoom(Room *parent, Room *child, int side){
-	if(side == 0){
-		if(parent->left == NULL){
+Room* createRoomWithRequiredItem(const char *description, const char *secondDescription ,int requiredItemId) {
+	Room *newRoom = createRoom(description, secondDescription);
+	newRoom->requiredItemId = requiredItemId;
+	return newRoom;
+}
+
+bool playerHasItem(Player *player, int itemId) {
+	Item *current = player->inventory;
+	while (current != NULL) {
+		if (current->id == itemId) {
+			return true;
+		}
+		current = current->next;
+	}
+	return false;
+}
+
+void insertChildRoom(Room *parent, Room *child, int side) {
+	if (side == 0) {
+		if (parent->left == NULL) {
 			parent->left = child;
 			child->parent = parent;
-		}else{
+		} else {
 			printf("Ja existe uma sala a esquerda.\n");
 		}
-	}else if(side == 1){
-		if(parent->right == NULL){
+	} else if (side == 1) {
+		if (parent->right == NULL) {
 			parent->right = child;
 			child->parent = parent;
-		}else{
+		} else {
 			printf("Ja existe uma sala a direita.\n");
 		}
-	}else{
+	} else {
 		printf("Lado invalido.0 para esquerda e 1 para direita");
 	}
 }
 
 Room* createPuzzle() {
-	Room *inicialRoom = createRoom(loadDescription("src/rooms/inicial_room.txt"));
+	Room *inicialRoom = createRoom(loadDescription("src/rooms/inicial_room.txt"), "JA PASSOU AQUI");
 
-	Room *tunel = createRoom(loadDescription("src/rooms/tunel.txt"));
-	Room *door = createRoom("Voce entrou na porta\nEsquerda: Conversar com o guarda | Direita: Seguir pelo corredor\n");
+	Room *tunel = createRoom(loadDescription("src/rooms/tunel.txt"), "JA PASSOU AQUI");
+	Room *door =createRoomWithRequiredItem("Voce entrou na porta\n", "JA PASSOU AQUI", 1);
 
-	Room *trem = createRoom("Voce entra no trem\nEsquerda: NULO | Direita: NULO\n");
-	Room *lake = createRoom(loadDescription("src/rooms/lake_key.txt"));
+	Room *trem = createRoom("Voce entra no trem\nEsquerda: NULO | Direita: NULO\n", "JA PASSOU AQUI");
+	Room *lake = createRoom(loadDescription("src/rooms/lake_key.txt"), "JA PASSOU AQUI");
 
-
-	Room *guard = createRoom("Voce conversa com o guarda\nEsquerda: NULO | Direita: NULO.\n");
-	Room *corredor = createRoom("Voce segue pelo corredor\nEsquerda: NULO | Direita: NULO.\n");
+	Room *guard = createRoom("Voce conversa com o guarda\nEsquerda: NULO | Direita: NULO.\n", "JA PASSOU AQUI");
+	Room *corredor = createRoom("Voce segue pelo corredor\nEsquerda: NULO | Direita: NULO.\n", "JA PASSOU AQUI");
 
 	insertChildRoom(inicialRoom, tunel, 0);
 	insertChildRoom(inicialRoom, door, 1);
@@ -68,61 +102,81 @@ Room* createPuzzle() {
 	insertChildRoom(door, guard, 0);
 	insertChildRoom(door, corredor, 1);
 
+	Item key = { 1, "Chave", NULL };
+	addItemToRoom(lake, key);
+
 	return inicialRoom;
 }
 
-void chooseRoom(Room **currentRoom) {
-    char choose;
-    while (true) {
-        if (*currentRoom != NULL) {
-            printf("%s\n", (*currentRoom)->description);
-            scanf(" %c", &choose);
+void chooseRoom(Room **currentRoom, Player *player) {
+	char choose;
+	while (true) {
+		if (*currentRoom != NULL) {
 
-            if (choose == 'E') {
-                if ((*currentRoom)->left != NULL) {
-                    *currentRoom = (*currentRoom)->left;
-                } else {
-                    printf("Não há sala à esquerda.\n");
-                }
-            } else if (choose == 'D') {
-                if ((*currentRoom)->right != NULL) {
-                	 *currentRoom = (*currentRoom)->right;
-                } else {
-                    printf("Não há sala à direita.\n");
-                }
-            } else if (choose == 'V') {
-                if ((*currentRoom)->parent != NULL) {
-                    *currentRoom = (*currentRoom)->parent;
-                } else {
-                    printf("Não há mais salas para retornar.\n");
-                }
-            } else {
-                printf("Opcao invalida\n");
-            }
-        } else {
-            printf("Sala não encontrada. Encerrando...\n");
-            break;
-        }
-    }
+			if(!(*currentRoom)->visited){
+				printf("%s\n", (*currentRoom)->description);
+				(*currentRoom)->visited = true;
+			}else{
+				printf("%s\n", (*currentRoom)->secondDescription);
+			}
+			collectItem(*currentRoom, player);
+			scanf(" %c", &choose);
+
+			if (choose == 'E') {
+				if ((*currentRoom)->left != NULL) {
+					Room *nextRoom = (*currentRoom)->left;
+					if (nextRoom->requiredItemId != 0 && !playerHasItem(player,nextRoom->requiredItemId)) {
+						printf("Você precisa de um item específico para acessar esta sala.\n");
+					}else {
+                        *currentRoom = nextRoom;
+                    }
+				} else {
+					printf("Não há sala à esquerda.\n");
+				}
+			} else if (choose == 'D') {
+				if ((*currentRoom)->right != NULL) {
+					Room *nextRoom = (*currentRoom)->right;
+					if(nextRoom->requiredItemId !=0 && !playerHasItem(player,nextRoom->requiredItemId)){
+						printf("Você precisa de um item específico para acessar esta sala.\n");
+					}else {
+                        *currentRoom = nextRoom;
+                    }
+				} else {
+					printf("Não há sala à direita.\n");
+				}
+			} else if (choose == 'V') {
+				if ((*currentRoom)->parent != NULL) {
+					*currentRoom = (*currentRoom)->parent;
+				} else {
+					printf("Não há mais salas para retornar.\n");
+				}
+			} else {
+				printf("Opcao invalida\n");
+			}
+		} else {
+			printf("Sala não encontrada. Encerrando...\n");
+			break;
+		}
+	}
 }
 
 char* loadDescription(const char *filename) {
-    FILE *file = fopen(filename, "r");
-    if (!file) {
-        perror("Erro ao abrir o arquivo");
-        return NULL;
-    }
+	FILE *file = fopen(filename, "r");
+	if (!file) {
+		perror("Erro ao abrir o arquivo");
+		return NULL;
+	}
 
-    fseek(file, 0, SEEK_END);
-    long length = ftell(file);
-    fseek(file, 0, SEEK_SET);
+	fseek(file, 0, SEEK_END);
+	long length = ftell(file);
+	fseek(file, 0, SEEK_SET);
 
-    char *description = malloc(length + 1);
-    if (description) {
-        fread(description, 1, length, file);
-        description[length] = '\0';
-    }
+	char *description = malloc(length + 1);
+	if (description) {
+		fread(description, 1, length, file);
+		description[length] = '\0';
+	}
 
-    fclose(file);
-    return description;
+	fclose(file);
+	return description;
 }
