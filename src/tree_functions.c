@@ -33,15 +33,51 @@ void insertChildRoom(Room *parent, Room *child, int side){
 }
 
 Room* createPuzzle() {
-	Room *inicialRoom = createRoom("Primeira sala!");
-	Room *secondRoom = createRoom("Sala a esquerda da priemeira.");
-	Room *thirdRoom = createRoom("Sala a direita da primeira.");
-	insertChildRoom(inicialRoom, secondRoom, 0);
-	insertChildRoom(inicialRoom, thirdRoom, 1);
+	Room *inicialRoom = createRoom("Voce acorda em uma caverna\nEsquerda: Tunel | Direita: Porta.\n");
+
+	Room *tunel = createRoom("Voce entrou no tunel\nEsquerda: Pegar o trem | Direita: Entrar no lago.\n");
+	Room *door = createRoom("Voce entrou na porta\nEsquerda: Conversar com o guarda | Direita: Seguir pelo corredor\n");
+
+	Room *trem = createRoom("Voce entra no trem\nEsquerda: NULO | Direita: NULO\n");
+	Room *lake = createRoom("Voce entra no lago\nEsquerda: NULO | Direita: NULO\n");
+
+	Room *guard = createRoom("Voce conversa com o guarda\nEsquerda: NULO | Direita: NULO.\n");
+	Room *corredor = createRoom("Voce segue pelo corredor\nEsquerda: NULO | Direita: NULO.\n");
+
+	insertChildRoom(inicialRoom, tunel, 0);
+	insertChildRoom(inicialRoom, door, 1);
+
+	insertChildRoom(tunel, trem, 0);
+	insertChildRoom(tunel, lake, 1);
+
+	insertChildRoom(door, guard, 0);
+	insertChildRoom(door, corredor, 1);
 
 	return inicialRoom;
 }
 
+void chooseRoom(Room *currentRoom){
+	char choose;
+	while(1){
+		printf("%s\n", currentRoom->description);
+		printf("Ir para esquerda, direita ou voltar?");
+		scanf(" %c", &choose);
+
+		if(choose == 'E'){
+			currentRoom = currentRoom->left;
+		}
+		else if(choose == 'D'){
+			currentRoom = currentRoom->right;
+		}
+		else if (choose == 'V'){
+			currentRoom = currentRoom->parent;
+		}
+		else{
+			printf("Opcao invalida\n");
+		}
+	}
+
+}
 /*
 TreeNode* createPuzzle(int size) {
  TreeNode *root = NULL;
@@ -58,17 +94,6 @@ void printTree(TreeNode* root){
 						root, root->value, root->left, root->right);
 		printTree(root->left);
 		printTree(root->right);
-	}
-}
-
-void displayRoom(TreeNode* node){
-	switch(node->value){
-	case 1:
-		break;
-	case 2:
-		break;
-	case 3:
-		break;
 	}
 }
 

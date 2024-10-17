@@ -18,6 +18,7 @@ typedef struct TreeNode{
 Room* createRoom(const char *description);
 void insertChildRoom(Room *parent, Room *child, int side);
 Room* createPuzzle();
-
+void displayRoom(Room* room);
+void chooseRoom(Room *currentRoom);
 
 #endif
