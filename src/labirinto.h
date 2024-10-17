@@ -7,16 +7,17 @@
 #include <time.h>
 
 typedef struct TreeNode{
-	int value;
+	int id;
+	char *description;
 	struct TreeNode *left;
 	struct TreeNode *right;
 	struct TreeNode *parent;
-}TreeNode;
+}Room;
 
 
-TreeNode* createNode(int value);
-TreeNode* createPuzzle(int size);
-void play(TreeNode *node, int answer);
-void printTree(TreeNode* root);
+Room* createRoom(const char *description);
+void insertChildRoom(Room *parent, Room *child, int side);
+Room* createPuzzle();
+
 
 #endif

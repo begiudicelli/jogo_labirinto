@@ -1,47 +1,56 @@
 #include "labirinto.h"
 
-TreeNode* createNode(int value) {
-	TreeNode *newNode = (TreeNode*) malloc(sizeof(TreeNode));
-	newNode->value = value;
-	newNode->right = NULL;
-	newNode->left = NULL;
-	newNode->parent = NULL;
-	return newNode;
+int nextId = 1;
+
+Room* createRoom(const char *description) {
+	Room *newRoom = (Room*) malloc(sizeof(Room));
+	newRoom->id = nextId++;
+	newRoom->description = strdup(description);
+	newRoom->right = NULL;
+	newRoom->left = NULL;
+	newRoom->parent = NULL;
+	return newRoom;
 }
 
-TreeNode* insertTreeNode(TreeNode *root, int value) {
-	if (root == NULL)
-		return createNode(value);
-
-	if (value > root->value) {
-		root->right = insertTreeNode(root->right, value);
-		root->right->parent = root;
-	} else {
-		root->left = insertTreeNode(root->left, value);
-		root->left->parent = root;
+void insertChildRoom(Room *parent, Room *child, int side){
+	if(side == 0){
+		if(parent->left == NULL){
+			parent->left = child;
+			child->parent = parent;
+		}else{
+			printf("Ja existe uma sala a esquerda.\n");
+		}
+	}else if(side == 1){
+		if(parent->right == NULL){
+			parent->right = child;
+			child->parent = parent;
+		}else{
+			printf("Ja existe uma sala a direita.\n");
+		}
+	}else{
+		printf("Lado invalido.0 para esquerda e 1 para direita");
 	}
-	return root;
 }
 
+Room* createPuzzle() {
+	Room *inicialRoom = createRoom("Primeira sala!");
+	Room *secondRoom = createRoom("Sala a esquerda da priemeira.");
+	Room *thirdRoom = createRoom("Sala a direita da primeira.");
+	insertChildRoom(inicialRoom, secondRoom, 0);
+	insertChildRoom(inicialRoom, thirdRoom, 1);
+
+	return inicialRoom;
+}
+
+/*
 TreeNode* createPuzzle(int size) {
-	TreeNode *root = NULL;
-	root = insertTreeNode(root, 10);
-	root = insertTreeNode(root, 8);
-	root = insertTreeNode(root, 12);
-	root = insertTreeNode(root, 6);
-	root = insertTreeNode(root, 15);
-	root = insertTreeNode(root, 13);
-	return root;
-}
-
-/*TreeNode* createPuzzle(int size) {
  TreeNode *root = NULL;
  for(int i = 0; i < size; i++){
  int value = rand() % 100;
  root = insertTreeNode(root, value);
  }
  return root;
- }*/
+ }
 
 void printTree(TreeNode* root){
 	if(root != NULL){
@@ -49,6 +58,17 @@ void printTree(TreeNode* root){
 						root, root->value, root->left, root->right);
 		printTree(root->left);
 		printTree(root->right);
+	}
+}
+
+void displayRoom(TreeNode* node){
+	switch(node->value){
+	case 1:
+		break;
+	case 2:
+		break;
+	case 3:
+		break;
 	}
 }
 
@@ -107,6 +127,7 @@ void play(TreeNode *node, int answer) {
     }
     printf("Você saiu do labirinto sem encontrar o tesouro!\n");
 }
+*/
 
 
 
