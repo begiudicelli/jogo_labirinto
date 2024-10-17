@@ -6,7 +6,7 @@ int main(void) {
 	srand(time(NULL));
 
 	Room *puzzle = createPuzzle();
-	chooseRoom(puzzle);
+	chooseRoom(&puzzle);
 
 	return 0;
 }

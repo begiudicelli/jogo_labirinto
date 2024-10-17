@@ -1,0 +1,11 @@
+Você acorda em uma caverna escura, a umidade do chão gelado se infiltra em suas roupas. 
+O cheiro de terra molhada e musgo fresco preenche o ar. 
+Um brilho suave surge à sua direita, revelando uma porta de madeira envelhecidaque.
+À sua esquerda, um túnel estreito se estende, envolto em sombras profundas.
+Você sente uma mistura de medo e curiosidade pulsando dentro de você.
+O que será que está além da porta? E o túnel?
+O que você fara?
+
+Esquerda: Túnel
+Direita: Porta
+

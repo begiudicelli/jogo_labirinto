@@ -33,9 +33,9 @@ void insertChildRoom(Room *parent, Room *child, int side){
 }
 
 Room* createPuzzle() {
-	Room *inicialRoom = createRoom("Voce acorda em uma caverna\nEsquerda: Tunel | Direita: Porta.\n");
+	Room *inicialRoom = createRoom(loadDescription("src/rooms/inicial_room.txt"));
 
-	Room *tunel = createRoom("Voce entrou no tunel\nEsquerda: Pegar o trem | Direita: Entrar no lago.\n");
+	Room *tunel = createRoom(loadDescription("src/rooms/tunel.txt"));
 	Room *door = createRoom("Voce entrou na porta\nEsquerda: Conversar com o guarda | Direita: Seguir pelo corredor\n");
 
 	Room *trem = createRoom("Voce entra no trem\nEsquerda: NULO | Direita: NULO\n");
@@ -56,107 +56,59 @@ Room* createPuzzle() {
 	return inicialRoom;
 }
 
-void chooseRoom(Room *currentRoom){
-	char choose;
-	while(1){
-		printf("%s\n", currentRoom->description);
-		printf("Ir para esquerda, direita ou voltar?");
-		scanf(" %c", &choose);
+void chooseRoom(Room **currentRoom) {
+    char choose;
+    while (true) {
+        if (*currentRoom != NULL) {
+            printf("%s\n", (*currentRoom)->description);
+            printf("Escolha uma opção: (E) - esquerda, (D) - direita, (V) - voltar\n");
+            scanf(" %c", &choose);
 
-		if(choose == 'E'){
-			currentRoom = currentRoom->left;
-		}
-		else if(choose == 'D'){
-			currentRoom = currentRoom->right;
-		}
-		else if (choose == 'V'){
-			currentRoom = currentRoom->parent;
-		}
-		else{
-			printf("Opcao invalida\n");
-		}
-	}
-
-}
-/*
-TreeNode* createPuzzle(int size) {
- TreeNode *root = NULL;
- for(int i = 0; i < size; i++){
- int value = rand() % 100;
- root = insertTreeNode(root, value);
- }
- return root;
- }
-
-void printTree(TreeNode* root){
-	if(root != NULL){
-		printf("\nAtual %p - Código %d - Esquerda %p - Direita - %p",
-						root, root->value, root->left, root->right);
-		printTree(root->left);
-		printTree(root->right);
-	}
-}
-
-void play(TreeNode *node, int answer) {
-    while (node != NULL) {
-        if (node->value == answer) {
-            printf("Você chegou no tesouro!\n");
-            return;
-        }
-        printf("Você está em um nó com o valor: %d\n", node->value);
-
-        if (node->right == NULL && node->left == NULL) {
-            printf("Encontrou um beco sem saída! Voltando para trás...\n");
-            node = node->parent;
-            continue;
-        }
-
-        if (node->right == NULL) {
-            printf("Não há caminho para a direita. Retornar ou ir para a esquerda?\n");
-            char escolha;
-            printf("Escolha (e/v): ");
-            scanf(" %c", &escolha);
-            if (escolha == 'e') {
-                node = node->left;
+            if (choose == 'E') {
+                if ((*currentRoom)->left != NULL) {
+                    *currentRoom = (*currentRoom)->left;
+                } else {
+                    printf("Não há sala à esquerda.\n");
+                }
+            } else if (choose == 'D') {
+                if ((*currentRoom)->right != NULL) {
+                    *currentRoom = (*currentRoom)->right;
+                } else {
+                    printf("Não há sala à direita.\n");
+                }
+            } else if (choose == 'V') {
+                if ((*currentRoom)->parent != NULL) {
+                    *currentRoom = (*currentRoom)->parent;
+                } else {
+                    printf("Não há mais salas para retornar.\n");
+                }
             } else {
-                node = node->parent;
+                printf("Opcao invalida\n");
             }
-            continue;
-        }
-
-        if (node->left == NULL) {
-            printf("Não há caminho para a esquerda. Retornar ou ir para a direita?\n");
-            char escolha;
-            printf("Escolha (d/v): ");
-            scanf(" %c", &escolha);
-            if (escolha == 'd') {
-                node = node->right;
-            } else {
-                node = node->parent;
-            }
-            continue;
-        }
-
-        char escolha;
-        printf("Escolha (e/d): ");
-        scanf(" %c", &escolha);
-
-        if (escolha == 'e') {
-            node = node->left;
-        } else if (escolha == 'd') {
-            node = node->right;
         } else {
-            printf("Escolha inválida! Tente novamente.\n");
-            node = node->parent;
+            printf("Sala não encontrada. Encerrando...\n");
+            break;
         }
     }
-    printf("Você saiu do labirinto sem encontrar o tesouro!\n");
 }
-*/
 
+char* loadDescription(const char *filename) {
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        perror("Erro ao abrir o arquivo");
+        return NULL;
+    }
 
+    fseek(file, 0, SEEK_END);
+    long length = ftell(file);
+    fseek(file, 0, SEEK_SET);
 
+    char *description = malloc(length + 1);
+    if (description) {
+        fread(description, 1, length, file);
+        description[length] = '\0';
+    }
 
-
-
-
+    fclose(file);
+    return description;
+}
