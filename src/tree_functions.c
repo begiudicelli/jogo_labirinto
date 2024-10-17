@@ -2,6 +2,20 @@
 
 int nextId = 1;
 
+Item* createItemList(int id, char *name) {
+	Item* newItem = (Item*)malloc(sizeof(Item));
+    newItem->id = id;
+    newItem->name = strdup(name);
+    newItem->next = NULL;
+    return newItem;
+}
+
+void insertItem(Item** head, int id, char *name) {
+	Item* newNode = createItemList(id, name);
+    newNode->next = *head;
+    *head = newNode;
+}
+
 Room* createRoom(const char *description) {
 	Room *newRoom = (Room*) malloc(sizeof(Room));
 	newRoom->id = nextId++;
@@ -39,7 +53,8 @@ Room* createPuzzle() {
 	Room *door = createRoom("Voce entrou na porta\nEsquerda: Conversar com o guarda | Direita: Seguir pelo corredor\n");
 
 	Room *trem = createRoom("Voce entra no trem\nEsquerda: NULO | Direita: NULO\n");
-	Room *lake = createRoom("Voce entra no lago\nEsquerda: NULO | Direita: NULO\n");
+	Room *lake = createRoom(loadDescription("src/rooms/lake_key.txt"));
+
 
 	Room *guard = createRoom("Voce conversa com o guarda\nEsquerda: NULO | Direita: NULO.\n");
 	Room *corredor = createRoom("Voce segue pelo corredor\nEsquerda: NULO | Direita: NULO.\n");
@@ -61,7 +76,6 @@ void chooseRoom(Room **currentRoom) {
     while (true) {
         if (*currentRoom != NULL) {
             printf("%s\n", (*currentRoom)->description);
-            printf("Escolha uma opção: (E) - esquerda, (D) - direita, (V) - voltar\n");
             scanf(" %c", &choose);
 
             if (choose == 'E') {
@@ -72,7 +86,7 @@ void chooseRoom(Room **currentRoom) {
                 }
             } else if (choose == 'D') {
                 if ((*currentRoom)->right != NULL) {
-                    *currentRoom = (*currentRoom)->right;
+                	 *currentRoom = (*currentRoom)->right;
                 } else {
                     printf("Não há sala à direita.\n");
                 }

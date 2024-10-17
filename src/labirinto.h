@@ -7,12 +7,19 @@
 #include <time.h>
 #include <stdbool.h>
 
+typedef struct LinkedList{
+	int id;
+	char *name;
+	struct LinkedList *next;
+}Item;
+
 typedef struct TreeNode{
 	int id;
 	char *description;
 	struct TreeNode *left;
 	struct TreeNode *right;
 	struct TreeNode *parent;
+	Item *items;
 }Room;
 
 
@@ -21,6 +28,9 @@ void insertChildRoom(Room *parent, Room *child, int side);
 Room* createPuzzle();
 void displayRoom(Room* room);
 void chooseRoom(Room **currentRoom);
+Item* createItemList(int id, char *name);
+void insertItem(Item** head, int id, char *name);
+
 
 char* loadDescription(const char *filename);
 
