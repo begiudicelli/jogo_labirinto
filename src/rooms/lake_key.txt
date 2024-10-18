@@ -11,4 +11,4 @@ Com determinação, você mergulha mais fundo, alcançando a chave e, com um esf
 Agora, com a chave na mão, você retorna à margem, sentindo uma mistura de alívio e excitação. 
 O que será que essa chave desbloqueia?
 
-Escolha uma opção: (V) - Voltar
+V: Voltar

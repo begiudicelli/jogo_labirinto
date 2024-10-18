@@ -15,8 +15,7 @@ void collectItem(Room *room, Player *player) {
 }
 
 void addItemToRoom(Room *room, Item item) {
-	if (room == NULL)
-		return;
+	if (room == NULL) return;
 	Item *newItem = createItemList(item.id, item.name);
 	newItem->next = room->items;
 	room->items = newItem;
@@ -82,16 +81,24 @@ void insertChildRoom(Room *parent, Room *child, int side) {
 }
 
 Room* createPuzzle() {
-	Room *inicialRoom = createRoom(loadDescription("src/rooms/inicial_room.txt"), "JA PASSOU AQUI");
+	Room *inicialRoom = createRoom(loadDescription("src/rooms/inicial_room.txt"),
+			loadDescription("src/rooms/inicial_room2.txt"));
 
-	Room *tunel = createRoom(loadDescription("src/rooms/tunel.txt"), "JA PASSOU AQUI");
-	Room *door =createRoomWithRequiredItem("Voce entrou na porta\n", "JA PASSOU AQUI", 1);
+	Room *tunel = createRoom(loadDescription("src/rooms/newtunel.txt"),
+			loadDescription("src/rooms/tunel2.txt"));
+	Room *door =createRoomWithRequiredItem("Voce entrou na porta\n",
+			"JA PASSOU AQUI", 1);
 
-	Room *trem = createRoom("Voce entra no trem\nEsquerda: NULO | Direita: NULO\n", "JA PASSOU AQUI");
-	Room *lake = createRoom(loadDescription("src/rooms/lake_key.txt"), "JA PASSOU AQUI");
+	Room *trem = createRoom("Voce entra no trem\nEsquerda: NULO | Direita: NULO\n",
+			"JA PASSOU AQUI");
+	Room *lake = createRoom(loadDescription("src/rooms/lake_key.txt"),
+			loadDescription("src/rooms/lake_key2.txt"));
 
-	Room *guard = createRoom("Voce conversa com o guarda\nEsquerda: NULO | Direita: NULO.\n", "JA PASSOU AQUI");
-	Room *corredor = createRoom("Voce segue pelo corredor\nEsquerda: NULO | Direita: NULO.\n", "JA PASSOU AQUI");
+	Room *guard = createRoom("Voce conversa com o guarda\nEsquerda: NULO | Direita: NULO.\n",
+			"JA PASSOU AQUI");
+	Room *corredor = createRoom("Voce segue pelo corredor\nEsquerda: NULO | Direita: NULO.\n",
+			"JA PASSOU AQUI");
+
 
 	insertChildRoom(inicialRoom, tunel, 0);
 	insertChildRoom(inicialRoom, door, 1);
@@ -112,7 +119,6 @@ void chooseRoom(Room **currentRoom, Player *player) {
 	char choose;
 	while (true) {
 		if (*currentRoom != NULL) {
-
 			if(!(*currentRoom)->visited){
 				printf("%s\n", (*currentRoom)->description);
 				(*currentRoom)->visited = true;
@@ -160,23 +166,37 @@ void chooseRoom(Room **currentRoom, Player *player) {
 	}
 }
 
-char* loadDescription(const char *filename) {
-	FILE *file = fopen(filename, "r");
-	if (!file) {
-		perror("Erro ao abrir o arquivo");
-		return NULL;
-	}
-
-	fseek(file, 0, SEEK_END);
-	long length = ftell(file);
-	fseek(file, 0, SEEK_SET);
-
-	char *description = malloc(length + 1);
-	if (description) {
-		fread(description, 1, length, file);
-		description[length] = '\0';
-	}
-
-	fclose(file);
-	return description;
+void trimTrailingSpaces(char *str) {
+    int length = strlen(str);
+    while (length > 0 && (str[length - 1] == ' ' || str[length - 1] == '\n' || str[length - 1] == '\r')) {
+        str[--length] = '\0';
+    }
 }
+
+
+char* loadDescription(const char *filename) {
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        perror("Erro ao abrir o arquivo");
+        return NULL;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long length = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    char *description = malloc(length + 1);
+    if (description) {
+        size_t bytesRead = fread(description, 1, length, file);
+        description[bytesRead] = '\0';
+        trimTrailingSpaces(description);
+    } else {
+        perror("Erro ao alocar memória");
+    }
+
+    fclose(file);
+    return description;
+}
+
+
+

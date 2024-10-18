@@ -1,0 +1,4 @@
+Você retorna a sala inicial.
+
+Esquerda: Túnel
+Direita: Porta
