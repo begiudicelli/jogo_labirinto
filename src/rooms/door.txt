@@ -1,0 +1,7 @@
+Voce entra pela porta e se depara com uma maga que te da o poder de 2 novos feitiços!
+Ela te afirma que por este caminho, vao existir inimigos ate encontrar a saida.
+A cada inimigo derrotado, voce ganhara um novo poder!
+
+Esquerda: ???(goblin)
+Direita: ???(slime)
+
