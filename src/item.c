@@ -32,6 +32,11 @@ void addItemToRoom(Room *room, Item item) {
     room->items = newItem;
 }
 
+void addSpellToRoom(Room *room, Spell *spell){
+	if(room == NULL || spell == NULL) return;
+	room->spell = spell;
+}
+
 Item* createItemList(int id, char *name) {
     Item *newItem = (Item*) malloc(sizeof(Item));
     newItem->id = id;

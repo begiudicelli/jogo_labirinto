@@ -18,8 +18,7 @@ typedef struct Spell {
 	char *name;
 	int cooldown;
 	double damage;
-	double mana;
-	double cost;
+	double manaCost;
 } Spell;
 
 typedef struct Player {
@@ -48,6 +47,7 @@ typedef struct TreeNode {
 	int requiredItemId;
 	bool visited;
 	Enemy *enemy;
+	Spell *spell;
 } Room;
 
 //Room functions
@@ -59,6 +59,7 @@ void displayRoom(Room *room);
 void chooseRoom(Room **currentRoom, Player *player);
 void moveToRoomAndCheckItem(Room **currentRoom, Player *player, int side);
 bool checkRoomForEnemy(Room **currentRoom);
+bool checkRoomForItem(Room *currentRoom, Player *player);
 
 //Inventory and item functions
 Item* createItemList(int id, char *name);
@@ -71,11 +72,12 @@ Item* createItemList(int id, char *name);
 bool playerHasItem(Player *player, int itemId);
 
 //Battle
-Spell* createSpell(int id, const char *name, int cooldown);
+Spell* createSpell(int id, const char *name, int cooldown, double damage, double manaCost);
 void addSpellToBar(Player *player, Spell *spell);
 Player* createPlayer(double health, double mana);
 Enemy* createEnemy(int id, const char *name, double health, double attack);
 void battle(Player *player, Room **currentRoom);
+void addSpellToRoom(Room *room, Spell *spell);
 
 //File handling
 char* loadDescription(const char *filename);

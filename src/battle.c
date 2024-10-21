@@ -20,16 +20,22 @@ Enemy* createEnemy(int id, const char *name, double health, double attack){
 	return newEnemy;
 }
 
-Spell* createSpell(int id, const char *name, int cooldown) {
+Spell* createSpell(int id, const char *name, int cooldown, double damage, double manaCost) {
     Spell *newSpell = (Spell *)malloc(sizeof(Spell));
     newSpell->id = id;
     newSpell->name = strdup(name);
     newSpell->cooldown = cooldown;
+    newSpell->damage = damage;
+    newSpell->manaCost = manaCost;
     return newSpell;
 }
 
-void addSpellToBar(Player *player, Spell *spell){
-	player->spellBar[player->spellCount++] = *spell;
+void addSpellToBar(Player *player, Spell *spell) {
+    if (player->spellCount < MAX_SPELLS) {
+        player->spellBar[player->spellCount++] = *spell;
+    } else {
+        printf("Spell bar is full!\n");
+    }
 }
 
 void playerAttack(Player *player, Enemy *enemy, int spellIndex){
@@ -40,10 +46,10 @@ void playerAttack(Player *player, Enemy *enemy, int spellIndex){
 
 	Spell *spell = &player->spellBar[spellIndex];
 
-	if(player->mana >= spell->cost){
-		player->mana -= spell->cost;
+	if(player->mana >= spell->manaCost){
+		player->mana -= spell->manaCost;
 		enemy->health -= spell->damage;
-		printf("voce lanca o feitico %s causando %2.f de dano!", spell->name, spell->damage);
+		printf("Voce lanca o feitico %s causando %2.f de dano!\nD", spell->name, spell->damage);
 	}else{
 		printf("Nao tem mana para usar o feitico %s", spell->name);
 	}
@@ -51,8 +57,7 @@ void playerAttack(Player *player, Enemy *enemy, int spellIndex){
 
 void enemyAttack(Player *player, Enemy *enemy){
 	player->health -= enemy->attack;
-	printf("%s te ataca causando %.2f de dano\n", enemy->name, enemy->attack);
-
+	printf("\n%s te ataca causando %.2f de dano\n", enemy->name, enemy->attack);
 }
 
 
@@ -61,15 +66,21 @@ void battle(Player *player, Room **currentRoom) {
     Enemy *enemy = (*currentRoom)->enemy;
 
     while (player->health > 0 && enemy) {
+
+        printf("\n--- Turn Start ---\n");
+        printf("HP:: %.2f | MP: %.2f\n", player->health, player->mana);
+        printf("HP do %s: %.2f\n", enemy->name, enemy->health);
+
         if (turn == 0) {
             printf("Seu turno!\n");
-            printf("Escolha um spell (0 até %d): ", player->spellCount - 1);
+            printf("Escolha um spell (0 até %d): \n", player->spellCount - 1);
             for (int i = 0; i < player->spellCount; i++) {
                 printf("%d: %s (Cooldown: %d, Dano: %.2f)\n", i,
                        player->spellBar[i].name,
                        player->spellBar[i].cooldown,
                        player->spellBar[i].damage);
             }
+            printf("Sua escolha: \n");
             int spellIndex;
             scanf("%d", &spellIndex);
             playerAttack(player, enemy, spellIndex);
@@ -80,7 +91,7 @@ void battle(Player *player, Room **currentRoom) {
 
         if (enemy->health <= 0) {
             printf("%s foi derrotado!\n", enemy->name);
-            (*currentRoom)->enemy = NULL; // Clear the enemy after defeat
+            (*currentRoom)->enemy = NULL;
             break;
         } else if (player->health <= 0) {
             printf("Você foi derrotado!\n");
