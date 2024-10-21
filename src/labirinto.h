@@ -19,6 +19,7 @@ typedef struct Spell {
 	int cooldown;
 	double damage;
 	double mana;
+	double cost;
 } Spell;
 
 typedef struct Player {
@@ -46,15 +47,18 @@ typedef struct TreeNode {
 	Item *items;
 	int requiredItemId;
 	bool visited;
+	Enemy *enemy;
 } Room;
 
 //Room functions
 Room* createRoom(const char *description, const char *secondDescription);
+Room* createRoomWithEnemy(const char *description, const char *secondDescription,Enemy *enemy);
 void insertChildRoom(Room *parent, Room *child, int side);
 Room* createPuzzle();
 void displayRoom(Room *room);
 void chooseRoom(Room **currentRoom, Player *player);
 void moveToRoomAndCheckItem(Room **currentRoom, Player *player, int side);
+bool checkRoomForEnemy(Room **currentRoom);
 
 //Inventory and item functions
 Item* createItemList(int id, char *name);
@@ -71,6 +75,7 @@ Spell* createSpell(int id, const char *name, int cooldown);
 void addSpellToBar(Player *player, Spell *spell);
 Player* createPlayer(double health, double mana);
 Enemy* createEnemy(int id, const char *name, double health, double attack);
+void battle(Player *player, Room **currentRoom);
 
 //File handling
 char* loadDescription(const char *filename);
